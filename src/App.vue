@@ -1,13 +1,12 @@
 <template>
-    <main class="wrap dark__theme">
+    <main class="wrap" :class="{'dark__theme' : !theme, 'light__theme' : theme}">
         <div class="todo_wrapper">
             <header>
                 <h1 class="todo_title">todo</h1>
-                <button class="theme_switcher" type="button"></button>
+                <button class="theme_switcher" type="button" @click="theme = !theme"></button>
             </header>
             <section class="todo_add_task">
                 <div class="todo_item todo_task todo_task_input">
-<!--                    <button type="button" class="todo_item__status"></button>-->
                     <input type="text" class="todo_item__input" @keyup.enter="addTask" v-model="taskToAdd"
                            placeholder="Type new task and press enter to add...">
                 </div>
@@ -19,9 +18,7 @@
                     <input type="text" class="todo_item__input" disabled v-bind:placeholder="task.text">
                     <button type="button" class="todo_item__delete" @click="deleteTask(task.id)"></button>
                 </div>
-            </section>
-            <section class="todo_footer">
-                <div class="todo_item">
+                <div class="todo_footer todo_item">
                     <span class="todo_item__info">{{toDoList.filter(i=>!i.isDone).length}} items left</span>
                     <div class="todo_item__actions">
                         <button class="todo_item__actions__btn active" @click="filterTasks('all',$event)">All</button>
@@ -41,6 +38,7 @@ export default {
     name: 'App',
     data: function (){
         return {
+            theme: false,
             taskToAdd: '',
             toDoList: [],
             filter: 'all',
@@ -56,23 +54,6 @@ export default {
         }
     },
     methods: {
-        filterTasks(filter,el){
-            if (el){
-                document.querySelector('.todo_item__actions__btn.active').classList.remove('active');
-                el.target.classList.add('active');
-            }
-            switch (filter){
-                case 'all':
-                    this.filter = 'all';
-                    return this.filtered = this.toDoList;
-                case 'active':
-                    this.filter = 'active';
-                    return this.filtered = this.toDoList.filter(task => !task.isDone);
-                case 'completed':
-                    this.filter = 'completed';
-                    return this.filtered = this.toDoList.filter(task => task.isDone);
-            }
-        },
         setTaskDone(id,e){
             e.target.parentElement.classList.toggle('task_done')
             let task = this.toDoList.findIndex(task => task.id === id);
@@ -97,6 +78,23 @@ export default {
             let toDelete = this.toDoList.filter(task=> task.isDone);
             this.toDoList = this.toDoList.filter(task => !toDelete.includes(task))
             return this.filterTasks(this.filter);
+        },
+        filterTasks(filter,el){
+            if (el){
+                document.querySelector('.todo_item__actions__btn.active').classList.remove('active');
+                el.target.classList.add('active');
+            }
+            switch (filter){
+                case 'all':
+                    this.filter = 'all';
+                    return this.filtered = this.toDoList;
+                case 'active':
+                    this.filter = 'active';
+                    return this.filtered = this.toDoList.filter(task => !task.isDone);
+                case 'completed':
+                    this.filter = 'completed';
+                    return this.filtered = this.toDoList.filter(task => task.isDone);
+            }
         }
     }
 }
@@ -126,6 +124,75 @@ $fontFix: translateY(11%); //font vertical alignment fix
         &.dark__theme {
             background: hsl(235, 21%, 11%) url("assets/bg-desktop-dark.jpg") no-repeat center top;
             background-size: 1440px;
+            header {
+                .theme_switcher {
+                    background: url("assets/icon-sun.svg") no-repeat center center;
+                    background-size: contain;
+                }
+            }
+            .todo_wrapper {
+                .todo_item {
+                    background: #25273c;
+                    color: #fff;
+                    .todo_item__input {
+                        color: #fff;
+                    }
+                    &.todo_task {
+                        border-bottom: .03em solid #37394e;
+                    }
+                }
+                .todo_footer {
+                    .todo_item__info {
+                        opacity: .3;
+                    }
+                    .todo_item__actions__btn {
+                        color: #fff;
+                        opacity: .3;
+                    }
+                }
+            }
+        }
+        &.light__theme {
+            background: #fafafa url("assets/bg-desktop-light.jpg") no-repeat center top;
+            background-size: 1440px;
+            header {
+                .theme_switcher {
+                    background: url("assets/icon-moon.svg") no-repeat center center;
+                    background-size: contain;
+                }
+            }
+            .todo_wrapper {
+                .todo_item {
+                    background: #ffffff;
+                    color: #4c4b59;
+                    .todo_item__input {
+                        color: #4c4b59;
+                    }
+                    &.todo_task {
+                        border-bottom: .023em solid #e6e5ea;
+                    }
+                    &:not(.task_done) {
+                        .todo_item__status {
+                            &:hover {
+                                border: solid .15em transparent;
+                                background: linear-gradient(to right, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
+                                background-origin: border-box;
+                                box-shadow: .2em 10em .1em #fff inset;
+                                transition: border-color $defaultTransition/2;
+                            }
+                        }
+                    }
+                }
+                .todo_footer {
+                    .todo_item__info {
+                        opacity: .8;
+                    }
+                    .todo_item__actions__btn {
+                        color: #4c4b59;
+                        opacity: .5;
+                    }
+                }
+            }
         }
     }
     .todo_wrapper {
@@ -148,27 +215,22 @@ $fontFix: translateY(11%); //font vertical alignment fix
                 border: 0;
                 width: 2.4em;
                 height: 2.4em;
-                background: url("assets/icon-sun.svg") no-repeat center center;
-                background-size: contain;
             }
         }
         .todo_item {
             width: 100%;
-            background: #25273c;
             border: 0;
             padding: 1.105em;
             font-size: 1em;
-            color: #fff;
             &.todo_task {
                 display: grid;
                 grid-template-columns: 1.35em 1fr 1.35em;
-                border-bottom: .1em solid #37394e;
             }
             &.todo_task_input {
                 box-shadow: 0 0 1em 0 rgba(18, 21, 30, .5);
                 border-radius: .3em;
                 margin-bottom: 1.5em;
-                border-bottom: none;
+                border-bottom: none !important;
                 display: block;
                 .todo_item__input {
                     width: 100%;
@@ -190,9 +252,6 @@ $fontFix: translateY(11%); //font vertical alignment fix
                     text-decoration: line-through;
                     opacity: .2;
                 }
-            }
-            &:not(.todo_task_input):not(:first-of-type){
-                border-top: .1em solid #37394e;
             }
             &:not(.task_done) {
                 .todo_item__status {
@@ -220,7 +279,6 @@ $fontFix: translateY(11%); //font vertical alignment fix
                 border: solid .15em #2f3146;
             }
             .todo_item__input {
-                color: #fff;
                 margin: 0 1.105em;
                 transform: $fontFix;
                 &::placeholder {
@@ -242,35 +300,36 @@ $fontFix: translateY(11%); //font vertical alignment fix
             .todo_item:first-child {
                 border-radius: .3em .3em 0 0;
             }
-        }
-        .todo_footer {
-            .todo_item {
+            .todo_item:last-child {
                 border-radius: 0 0 .3em .3em;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                font-size: 14px;
-                .todo_item__info {
-                    opacity: .3;
-                }
-                .todo_item__actions__btn {
-                    color: #fff;
-                    opacity: .3;
-                    &.active {
-                        opacity: 1;
-                        color: $primaryColor;
-                    }
-                    &:hover {
-                        opacity: 1;
-                        transition: opacity $defaultTransition;
-                    }
-                    &:not(:last-of-type){
-                        margin-right: 1.5em;
-                    }
-                    &:last-of-type {
-                        margin-left: 2.5em;
+            }
+            .todo_item:only-child{
+                border-radius: .3em;
+            }
+            .todo_footer {
+                &.todo_item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 14px;
+                    .todo_item__actions__btn {
+                        font-weight: bold;
+                        &.active {
+                            opacity: 1;
+                            color: $primaryColor;
+                        }
                         &:hover {
-                            opacity: .5;
+                            opacity: 1;
+                            transition: opacity $defaultTransition;
+                        }
+                        &:not(:last-of-type){
+                            margin-right: 1.5em;
+                        }
+                        &:last-of-type {
+                            margin-left: 2.5em;
+                            &:hover {
+                                opacity: .5;
+                            }
                         }
                     }
                 }
