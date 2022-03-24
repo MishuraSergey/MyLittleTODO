@@ -2,7 +2,7 @@
     <main class="wrap" :class="!userSettings.theme ? 'dark__theme' : 'light__theme'">
         <div class="todo_wrapper">
             <header>
-                <h1 class="todo_title">todo</h1>
+                <h1 class="todo_title"><a href="/">todo</a></h1>
                 <div class="header_btns">
                     <button class="saving_switcher"
                             type="button"
@@ -302,8 +302,11 @@ $defaultTransition: .3s ease-out;
                 text-transform: uppercase;
                 font-size: 3em;
                 letter-spacing: .4em;
-                @include color-white;
                 @include fontFix;
+                a{
+                    @include color-white;
+                    text-decoration: none;
+                }
             }
             .header_btns {
                 .saving_switcher {

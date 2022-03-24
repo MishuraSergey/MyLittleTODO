@@ -22,6 +22,9 @@ npm run build
 - Semantic HTML5 markup
 - CSS Flexbox
 - CSS Grid
-- Vue.js
+- Vue CLI (Vue 3, Webpack, Babel, ESlint)
 - SASS
-- ESlint
+
+### Demo page
+
+https://mishura-todo.netlify.app/
