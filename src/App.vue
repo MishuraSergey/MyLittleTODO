@@ -3,30 +3,47 @@
         <div class="todo_wrapper">
             <header>
                 <h1 class="todo_title">todo</h1>
-                <button class="theme_switcher" type="button" @click="theme = !theme"></button>
+                <button class="theme_switcher"
+                    type="button"
+                    @click="theme = !theme"></button>
             </header>
-            <section class="todo_add_task">
-                <div class="todo_item todo_task todo_task_input">
-                    <input type="text" class="todo_item__input" @keyup.enter="addTask" v-model="taskToAdd"
-                           placeholder="Type new task and press enter to add...">
-                </div>
+            <section class="todo_item todo_input">
+                <input class="todo_item__input"
+                       type="text"
+                       @keyup.enter="addTask"
+                       v-model="taskToAdd"
+                       placeholder="Type new task and press enter to add...">
             </section>
             <section class="todo_tasks">
-                <div class="todo_item todo_task" :class="{ task_done: task.isDone }" v-for="task in filtered"
+                <div class="todo_item todo_task"
+                     :class="{ task_done: task.isDone }"
+                     v-for="task in filtered"
                      :key="task.id">
-                    <button type="button" class="todo_item__status" @click="setTaskDone(task.id, $event)"></button>
-                    <input type="text" class="todo_item__input" disabled v-bind:placeholder="task.text">
-                    <button type="button" class="todo_item__delete" @click="deleteTask(task.id)"></button>
+                    <button class="todo_item__status"
+                            type="button"
+                            @click="setTaskDone(task.id, $event)">
+                    </button>
+                    <input class="todo_item__input"
+                           type="text"
+                           disabled
+                           v-bind:placeholder="task.text">
+                    <button class="todo_item__delete"
+                            type="button"
+                            @click="deleteTask(task.id)"></button>
                 </div>
-                <div class="todo_footer todo_item">
+                <div class="todo_item todo_footer">
                     <span class="todo_item__info">{{toDoList.filter(i=>!i.isDone).length}} items left</span>
-                    <div class="todo_item__actions">
-                        <button class="todo_item__actions__btn active" @click="filterTasks('all',$event)">All</button>
-                        <button class="todo_item__actions__btn" @click="filterTasks('active',$event)">Active</button>
-                        <button class="todo_item__actions__btn" @click="filterTasks('completed',$event)">Completed
+                    <div class="todo_item__filter">
+                        <button class="todo_item__filter__btn active"
+                                @click="filterTasks('all',$event)">All</button>
+                        <button class="todo_item__filter__btn"
+                                @click="filterTasks('active',$event)">Active</button>
+                        <button class="todo_item__filter__btn"
+                                @click="filterTasks('completed',$event)">Completed
                         </button>
-                        <button class="todo_item__actions__btn" @click="deleteCompletedTasks">Clear Completed</button>
                     </div>
+                    <button class="btn_clear"
+                            @click="deleteCompletedTasks">Clear Completed</button>
                 </div>
             </section>
         </div>
@@ -81,7 +98,7 @@ export default {
         },
         filterTasks(filter,el){
             if (el){
-                document.querySelector('.todo_item__actions__btn.active').classList.remove('active');
+                document.querySelector('.todo_item__filter__btn.active').classList.remove('active');
                 el.target.classList.add('active');
             }
             switch (filter){
@@ -104,9 +121,24 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap');
 @import './css/normalize.css';
 
-$primaryColor: hsl(220, 98%, 61%);
+$activeColor: hsl(220, 98%, 61%);
 $defaultTransition: .3s ease-out;
-$fontFix: translateY(11%); //font vertical alignment fix
+
+@mixin color-dark {
+    color: #4c4b59;
+}
+
+@mixin color-white {
+    color: #fff;
+}
+
+@mixin box-shadow {
+    box-shadow: 0 0 1em 0 rgba(18, 21, 30, .5);
+}
+
+@mixin fontFix {
+    transform: translateY(11%); //font vertical alignment fix
+}
 
 #app {
     font-family: 'Josefin Sans', sans-serif;
@@ -117,13 +149,20 @@ $fontFix: translateY(11%); //font vertical alignment fix
     margin: 0 auto;
     position: relative;
     box-sizing: border-box;
+    @media all and (min-width: 375px) and (max-width: 600px) {
+        font-size: 3.2vw;
+    }
     .wrap {
         height: 100vh;
         overflow: auto;
-        padding-top: 3em;
+        padding: 3em 0;
         &.dark__theme {
             background: hsl(235, 21%, 11%) url("assets/bg-desktop-dark.jpg") no-repeat center top;
             background-size: 1440px;
+            @media all and (min-width: 375px) and (max-width: 600px) {
+                background: hsl(235, 21%, 11%) url("assets/bg-mobile-dark.jpg") no-repeat center top;
+                background-size: 100%;
+            }
             header {
                 .theme_switcher {
                     background: url("assets/icon-sun.svg") no-repeat center center;
@@ -133,21 +172,24 @@ $fontFix: translateY(11%); //font vertical alignment fix
             .todo_wrapper {
                 .todo_item {
                     background: #25273c;
-                    color: #fff;
-                    .todo_item__input {
-                        color: #fff;
-                    }
+                    @include color-white;
                     &.todo_task {
-                        border-bottom: .03em solid #37394e;
+                        border-color: #37394e;
                     }
                 }
                 .todo_footer {
                     .todo_item__info {
                         opacity: .3;
                     }
-                    .todo_item__actions__btn {
-                        color: #fff;
+                    button {
+                        @include color-white;
                         opacity: .3;
+                    }
+                    @media all and (min-width: 375px) and (max-width: 600px) {
+                        .todo_item__filter {
+                            background: #25273c;
+                            @include color-white;
+                        }
                     }
                 }
             }
@@ -155,6 +197,10 @@ $fontFix: translateY(11%); //font vertical alignment fix
         &.light__theme {
             background: #fafafa url("assets/bg-desktop-light.jpg") no-repeat center top;
             background-size: 1440px;
+            @media all and (min-width: 375px) and (max-width: 600px) {
+                background: hsl(235, 21%, 11%) url("assets/bg-mobile-light.jpg") no-repeat center top;
+                background-size: 100%;
+            }
             header {
                 .theme_switcher {
                     background: url("assets/icon-moon.svg") no-repeat center center;
@@ -164,12 +210,9 @@ $fontFix: translateY(11%); //font vertical alignment fix
             .todo_wrapper {
                 .todo_item {
                     background: #ffffff;
-                    color: #4c4b59;
-                    .todo_item__input {
-                        color: #4c4b59;
-                    }
+                    @include color-dark;
                     &.todo_task {
-                        border-bottom: .023em solid #e6e5ea;
+                        border-color: #e6e5ea;
                     }
                     &:not(.task_done) {
                         .todo_item__status {
@@ -187,9 +230,15 @@ $fontFix: translateY(11%); //font vertical alignment fix
                     .todo_item__info {
                         opacity: .8;
                     }
-                    .todo_item__actions__btn {
-                        color: #4c4b59;
+                    button {
+                        @include color-dark;
                         opacity: .5;
+                    }
+                    @media all and (min-width: 375px) and (max-width: 600px) {
+                        .todo_item__filter {
+                            background: #fff;
+                            @include color-dark;
+                        }
                     }
                 }
             }
@@ -199,17 +248,20 @@ $fontFix: translateY(11%); //font vertical alignment fix
         width: 100%;
         max-width: 540px;
         margin: 0 auto;
+        @media all and (min-width: 375px) and (max-width: 600px) {
+            width: 85%;
+        }
         header {
             margin-bottom: 3em;
             display: flex;
             align-items: center;
             justify-content: space-between;
             .todo_title {
-                color: #fff;
                 text-transform: uppercase;
                 font-size: 3em;
                 letter-spacing: .4em;
-                transform: $fontFix;
+                @include color-white;
+                @include fontFix;
             }
             .theme_switcher {
                 border: 0;
@@ -222,19 +274,22 @@ $fontFix: translateY(11%); //font vertical alignment fix
             border: 0;
             padding: 1.105em;
             font-size: 1em;
+            @media all and (min-width: 375px) and (max-width: 600px) {
+                padding: 1.4em;
+            }
             &.todo_task {
                 display: grid;
                 grid-template-columns: 1.35em 1fr 1.35em;
+                border-bottom: .03em solid transparent;
             }
-            &.todo_task_input {
-                box-shadow: 0 0 1em 0 rgba(18, 21, 30, .5);
+            &.todo_input {
+                @include box-shadow;
                 border-radius: .3em;
-                margin-bottom: 1.5em;
-                border-bottom: none !important;
-                display: block;
+                margin-bottom: 1em;
                 .todo_item__input {
                     width: 100%;
                     margin: 0 auto;
+                    color: inherit;
                     &::placeholder {
                         opacity: .3;
                     }
@@ -250,7 +305,7 @@ $fontFix: translateY(11%); //font vertical alignment fix
                 }
                 .todo_item__input {
                     text-decoration: line-through;
-                    opacity: .2;
+                    opacity: .5;
                 }
             }
             &:not(.task_done) {
@@ -280,7 +335,7 @@ $fontFix: translateY(11%); //font vertical alignment fix
             }
             .todo_item__input {
                 margin: 0 1.105em;
-                transform: $fontFix;
+                @include fontFix;
                 &::placeholder {
                     opacity: 1;
                 }
@@ -293,10 +348,15 @@ $fontFix: translateY(11%); //font vertical alignment fix
                 height: 1.35em;
                 background: url("assets/icon-cross.svg") no-repeat center center;
                 background-size: contain;
+                @media all and (min-width: 375px) and (max-width: 600px) {
+                    visibility: visible;
+                    opacity: 1;
+                }
             }
         }
         .todo_tasks {
-            box-shadow: 0 0 1em 0 rgba(18, 21, 30, .5);
+            @include box-shadow;
+            position: relative;
             .todo_item:first-child {
                 border-radius: .3em .3em 0 0;
             }
@@ -311,25 +371,41 @@ $fontFix: translateY(11%); //font vertical alignment fix
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    font-size: 14px;
-                    .todo_item__actions__btn {
-                        font-weight: bold;
-                        &.active {
-                            opacity: 1;
-                            color: $primaryColor;
-                        }
-                        &:hover {
-                            opacity: 1;
-                            transition: opacity $defaultTransition;
-                        }
-                        &:not(:last-of-type){
-                            margin-right: 1.5em;
-                        }
-                        &:last-of-type {
-                            margin-left: 2.5em;
-                            &:hover {
-                                opacity: .5;
+                    font-size: .8em;
+                    .todo_item__filter {
+                        @media all and (min-width: 375px) and (max-width: 600px) {
+                            position: absolute;
+                            bottom: -5.5em;
+                            left: 0;
+                            width: 100%;
+                            display: flex;
+                            justify-content: center;
+                            padding: 1.4em;
+                            border-radius: .3em;
+                            @include box-shadow;
+                            .todo_item__filter__btn {
+                                margin: 0 1em;
+                                font-size: 1.2em;
                             }
+                        }
+                        .todo_item__filter__btn {
+                            font-weight: bold;
+                            &.active {
+                                opacity: 1;
+                                color: $activeColor;
+                            }
+                            &:hover {
+                                opacity: 1;
+                                transition: opacity $defaultTransition;
+                            }
+                            &:not(:last-of-type){
+                                margin-right: 1.5em;
+                            }
+                        }
+                    }
+                    .btn_clear {
+                        &:hover {
+                            opacity: .5;
                         }
                     }
                 }
