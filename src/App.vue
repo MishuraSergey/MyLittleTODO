@@ -1,13 +1,21 @@
 <template>
-    <main class="wrap" :class="{'dark__theme' : !theme, 'light__theme' : theme}">
+    <main class="wrap" :class="!userSettings.theme ? 'dark__theme' : 'light__theme'">
         <div class="todo_wrapper">
             <header>
                 <h1 class="todo_title">todo</h1>
-                <button class="theme_switcher"
-                    type="button"
-                    @click="theme = !theme"></button>
+                <div class="header_btns">
+                    <button class="saving_switcher"
+                            type="button"
+                            @click="changeSavingSettings"
+                            :class="{'saved': userSettings.progressSaved}"
+                            :title="!userSettings.progressSaved ? 'Save my progress':
+                            'Stop tracking and delete my progress'"></button>
+                    <button class="theme_switcher"
+                            type="button"
+                            @click="userSettings.theme = !userSettings.theme"></button>
+                </div>
             </header>
-            <section class="todo_item todo_input">
+            <section class="todo_item todo_new_input">
                 <input class="todo_item__input"
                        type="text"
                        @keyup.enter="addTask"
@@ -55,6 +63,10 @@ export default {
     name: 'App',
     data: function (){
         return {
+            userSettings: {
+                theme: false,
+                progressSaved: false
+            },
             theme: false,
             taskToAdd: '',
             toDoList: [],
@@ -63,6 +75,11 @@ export default {
         }
     },
     beforeMount() {
+        if (localStorage.getItem('MyLittleTodo')){
+            this.toDoList = JSON.parse(localStorage.getItem('MyLittleTodo')).toDoList;
+            this.userSettings.theme = JSON.parse(localStorage.getItem('MyLittleTodo')).userSettings.theme;
+            this.userSettings.progressSaved = JSON.parse(localStorage.getItem('MyLittleTodo')).userSettings.progressSaved;
+        }
         return this.filtered = this.toDoList;
     },
     computed:{
@@ -101,6 +118,9 @@ export default {
                 document.querySelector('.todo_item__filter__btn.active').classList.remove('active');
                 el.target.classList.add('active');
             }
+            if (this.userSettings.progressSaved){
+                this.saveProgress()
+            }
             switch (filter){
                 case 'all':
                     this.filter = 'all';
@@ -111,6 +131,28 @@ export default {
                 case 'completed':
                     this.filter = 'completed';
                     return this.filtered = this.toDoList.filter(task => task.isDone);
+            }
+        },
+        changeSavingSettings(){
+            if (!this.userSettings.progressSaved){
+                this.userSettings.progressSaved = true;
+                this.saveProgress();
+            }
+            else {
+                this.userSettings.progressSaved = false;
+                localStorage.removeItem('MyLittleTodo');
+            }
+        },
+        saveProgress(){
+            try {
+                const userSaves = JSON.stringify({
+                    toDoList: this.toDoList,
+                    userSettings: this.userSettings
+                });
+                localStorage.setItem('MyLittleTodo', userSaves);
+            }
+            catch(err) {
+                console.error(`Error: ${err}`)
             }
         }
     }
@@ -263,10 +305,25 @@ $defaultTransition: .3s ease-out;
                 @include color-white;
                 @include fontFix;
             }
-            .theme_switcher {
-                border: 0;
-                width: 2.4em;
-                height: 2.4em;
+            .header_btns {
+                .saving_switcher {
+                    border: 0;
+                    width: 2.4em;
+                    height: 2.4em;
+                    background: url("assets/icon-save.svg") no-repeat center center;
+                    background-size: contain;
+                    filter: invert(1);
+                    &.saved {
+                        background: url("assets/icon-delete.svg") no-repeat center center;
+                        background-size: contain;
+                    }
+                }
+                .theme_switcher {
+                    border: 0;
+                    width: 2.4em;
+                    height: 2.4em;
+                    margin-left: 1em;
+                }
             }
         }
         .todo_item {
@@ -282,7 +339,7 @@ $defaultTransition: .3s ease-out;
                 grid-template-columns: 1.35em 1fr 1.35em;
                 border-bottom: .03em solid transparent;
             }
-            &.todo_input {
+            &.todo_new_input {
                 @include box-shadow;
                 border-radius: .3em;
                 margin-bottom: 1em;
