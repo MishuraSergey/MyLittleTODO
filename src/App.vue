@@ -76,9 +76,8 @@ export default {
     },
     beforeMount() {
         if (localStorage.getItem('MyLittleTodo')){
-            this.toDoList = JSON.parse(localStorage.getItem('MyLittleTodo')).toDoList;
-            this.userSettings.theme = JSON.parse(localStorage.getItem('MyLittleTodo')).userSettings.theme;
-            this.userSettings.progressSaved = JSON.parse(localStorage.getItem('MyLittleTodo')).userSettings.progressSaved;
+            const saveData = JSON.parse(localStorage.getItem('MyLittleTodo'));
+            Object.entries(saveData).forEach(([key,val]) =>  this[key] = val )
         }
         return this.filtered = this.toDoList;
     },
@@ -95,13 +94,15 @@ export default {
             return this.filterTasks(this.filter);
         },
         addTask(){
-            this.toDoList.push({
-                id: this.generateNewTaskId,
-                text: this.taskToAdd,
-                isDone: false
-            });
-            this.taskToAdd = '';
-            return this.filterTasks(this.filter);
+            if (this.taskToAdd.length){
+                this.toDoList.push({
+                    id: this.generateNewTaskId,
+                    text: this.taskToAdd,
+                    isDone: false
+                });
+                this.taskToAdd = '';
+                return this.filterTasks(this.filter);
+            }
         },
         deleteTask(id){
             let task = this.toDoList.findIndex(task => task.id === id);
@@ -285,187 +286,187 @@ $defaultTransition: .3s ease-out;
                 }
             }
         }
-    }
-    .todo_wrapper {
-        width: 100%;
-        max-width: 540px;
-        margin: 0 auto;
-        @media all and (min-width: 375px) and (max-width: 600px) {
-            width: 85%;
-        }
-        header {
-            margin-bottom: 3em;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            .todo_title {
-                text-transform: uppercase;
-                font-size: 3em;
-                letter-spacing: .4em;
-                @include fontFix;
-                a{
-                    @include color-white;
-                    text-decoration: none;
-                }
-            }
-            .header_btns {
-                .saving_switcher {
-                    border: 0;
-                    width: 2.4em;
-                    height: 2.4em;
-                    background: url("assets/icon-save.svg") no-repeat center center;
-                    background-size: contain;
-                    filter: invert(1);
-                    &.saved {
-                        background: url("assets/icon-delete.svg") no-repeat center center;
-                        background-size: contain;
-                    }
-                }
-                .theme_switcher {
-                    border: 0;
-                    width: 2.4em;
-                    height: 2.4em;
-                    margin-left: 1em;
-                }
-            }
-        }
-        .todo_item {
+        .todo_wrapper {
             width: 100%;
-            border: 0;
-            padding: 1.105em;
-            font-size: 1em;
+            max-width: 540px;
+            margin: 0 auto;
             @media all and (min-width: 375px) and (max-width: 600px) {
-                padding: 1.4em;
+                width: 85%;
             }
-            &.todo_task {
-                display: grid;
-                grid-template-columns: 1.35em 1fr 1.35em;
-                border-bottom: .03em solid transparent;
-            }
-            &.todo_new_input {
-                @include box-shadow;
-                border-radius: .3em;
-                margin-bottom: 1em;
-                .todo_item__input {
-                    width: 100%;
-                    margin: 0 auto;
-                    color: inherit;
-                    &::placeholder {
-                        opacity: .3;
+            header {
+                margin-bottom: 3em;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                .todo_title {
+                    text-transform: uppercase;
+                    font-size: 3em;
+                    letter-spacing: .4em;
+                    @include fontFix;
+                    a{
+                        @include color-white;
+                        text-decoration: none;
+                    }
+                }
+                .header_btns {
+                    .saving_switcher {
+                        border: 0;
+                        width: 2.4em;
+                        height: 2.4em;
+                        background: url("assets/icon-save.svg") no-repeat center center;
+                        background-size: contain;
+                        filter: invert(1);
+                        &.saved {
+                            background: url("assets/icon-delete.svg") no-repeat center center;
+                            background-size: contain;
+                        }
+                    }
+                    .theme_switcher {
+                        border: 0;
+                        width: 2.4em;
+                        height: 2.4em;
+                        margin-left: 1em;
                     }
                 }
             }
-            &.task_done {
-                .todo_item__status {
-                    background: url("assets/icon-check.svg") no-repeat center center,
-                    linear-gradient(to right, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
-                    background-size: 50%, cover;
-                    background-origin: border-box;
-                    border: solid .15em transparent;
-                }
-                .todo_item__input {
-                    text-decoration: line-through;
-                    opacity: .5;
-                }
-            }
-            &:not(.task_done) {
-                .todo_item__status {
-                    &:hover {
-                        border: solid .15em transparent;
-                        background: linear-gradient(to right, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
-                        background-origin: border-box;
-                        box-shadow: .2em 10em .1em #25273c inset;
-                        transition: border-color $defaultTransition/2;
-                    }
-                }
-            }
-            &:hover {
-                .todo_item__delete {
-                    visibility: visible;
-                    opacity: 1;
-                }
-            }
-            .todo_item__status {
-                width: 1.35em;
-                height: 1.35em;
-                border-radius: 50%;
-                position: relative;
-                z-index: 1;
-                border: solid .15em #2f3146;
-            }
-            .todo_item__input {
-                margin: 0 1.105em;
-                @include fontFix;
-                &::placeholder {
-                    opacity: 1;
-                }
-            }
-            .todo_item__delete {
-                visibility: hidden;
-                opacity: 0;
-                transition: opacity $defaultTransition;
-                width: 1.35em;
-                height: 1.35em;
-                background: url("assets/icon-cross.svg") no-repeat center center;
-                background-size: contain;
+            .todo_item {
+                width: 100%;
+                border: 0;
+                padding: 1.105em;
+                font-size: 1em;
                 @media all and (min-width: 375px) and (max-width: 600px) {
-                    visibility: visible;
-                    opacity: 1;
+                    padding: 1.4em;
                 }
-            }
-        }
-        .todo_tasks {
-            @include box-shadow;
-            position: relative;
-            .todo_item:first-child {
-                border-radius: .3em .3em 0 0;
-            }
-            .todo_item:last-child {
-                border-radius: 0 0 .3em .3em;
-            }
-            .todo_item:only-child{
-                border-radius: .3em;
-            }
-            .todo_footer {
-                &.todo_item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    font-size: .8em;
-                    .todo_item__filter {
-                        @media all and (min-width: 375px) and (max-width: 600px) {
-                            position: absolute;
-                            bottom: -5.5em;
-                            left: 0;
-                            width: 100%;
-                            display: flex;
-                            justify-content: center;
-                            padding: 1.4em;
-                            border-radius: .3em;
-                            @include box-shadow;
-                            .todo_item__filter__btn {
-                                margin: 0 1em;
-                                font-size: 1.2em;
-                            }
-                        }
-                        .todo_item__filter__btn {
-                            font-weight: bold;
-                            &.active {
-                                opacity: 1;
-                                color: $activeColor;
-                            }
-                            &:hover {
-                                opacity: 1;
-                                transition: opacity $defaultTransition;
-                            }
-                            &:not(:last-of-type){
-                                margin-right: 1.5em;
-                            }
+                &.todo_task {
+                    display: grid;
+                    grid-template-columns: 1.35em 1fr 1.35em;
+                    border-bottom: .03em solid transparent;
+                }
+                &.todo_new_input {
+                    @include box-shadow;
+                    border-radius: .3em;
+                    margin-bottom: 1em;
+                    .todo_item__input {
+                        width: 100%;
+                        margin: 0 auto;
+                        color: inherit;
+                        &::placeholder {
+                            opacity: .3;
                         }
                     }
-                    .btn_clear {
+                }
+                &.task_done {
+                    .todo_item__status {
+                        background: url("assets/icon-check.svg") no-repeat center center,
+                        linear-gradient(to right, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
+                        background-size: 50%, cover;
+                        background-origin: border-box;
+                        border: solid .15em transparent;
+                    }
+                    .todo_item__input {
+                        text-decoration: line-through;
+                        opacity: .5;
+                    }
+                }
+                &:not(.task_done) {
+                    .todo_item__status {
                         &:hover {
-                            opacity: .5;
+                            border: solid .15em transparent;
+                            background: linear-gradient(to right, hsl(192, 100%, 67%), hsl(280, 87%, 65%));
+                            background-origin: border-box;
+                            box-shadow: .2em 10em .1em #25273c inset;
+                            transition: border-color $defaultTransition/2;
+                        }
+                    }
+                }
+                &:hover {
+                    .todo_item__delete {
+                        visibility: visible;
+                        opacity: 1;
+                    }
+                }
+                .todo_item__status {
+                    width: 1.35em;
+                    height: 1.35em;
+                    border-radius: 50%;
+                    position: relative;
+                    z-index: 1;
+                    border: solid .15em #2f3146;
+                }
+                .todo_item__input {
+                    margin: 0 1.105em;
+                    @include fontFix;
+                    &::placeholder {
+                        opacity: 1;
+                    }
+                }
+                .todo_item__delete {
+                    visibility: hidden;
+                    opacity: 0;
+                    transition: opacity $defaultTransition;
+                    width: 1.35em;
+                    height: 1.35em;
+                    background: url("assets/icon-cross.svg") no-repeat center center;
+                    background-size: contain;
+                    @media all and (min-width: 375px) and (max-width: 600px) {
+                        visibility: visible;
+                        opacity: 1;
+                    }
+                }
+            }
+            .todo_tasks {
+                @include box-shadow;
+                position: relative;
+                .todo_item:first-child {
+                    border-radius: .3em .3em 0 0;
+                }
+                .todo_item:last-child {
+                    border-radius: 0 0 .3em .3em;
+                }
+                .todo_item:only-child{
+                    border-radius: .3em;
+                }
+                .todo_footer {
+                    &.todo_item {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        font-size: .8em;
+                        .todo_item__filter {
+                            @media all and (min-width: 375px) and (max-width: 600px) {
+                                position: absolute;
+                                bottom: -5.5em;
+                                left: 0;
+                                width: 100%;
+                                display: flex;
+                                justify-content: center;
+                                padding: 1.4em;
+                                border-radius: .3em;
+                                @include box-shadow;
+                                .todo_item__filter__btn {
+                                    margin: 0 1em;
+                                    font-size: 1.2em;
+                                }
+                            }
+                            .todo_item__filter__btn {
+                                font-weight: bold;
+                                &.active {
+                                    opacity: 1;
+                                    color: $activeColor;
+                                }
+                                &:hover {
+                                    opacity: 1;
+                                    transition: opacity $defaultTransition;
+                                }
+                                &:not(:last-of-type){
+                                    margin-right: 1.5em;
+                                }
+                            }
+                        }
+                        .btn_clear {
+                            &:hover {
+                                opacity: .5;
+                            }
                         }
                     }
                 }
